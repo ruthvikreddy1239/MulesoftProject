@@ -1,0 +1,18 @@
+#%RAML 1.0
+baseUri: http://localhost:8089/api/*
+title: system
+version: v1
+
+/contact-details-to-db:
+  displayName: Contact Details To DB
+  description: | 
+    Processing messages to database   
+  post:
+    description: |
+      Publish the contact details to data base.
+    queryParameters: 
+      apiName:  
+        type: string 
+        required: true
+    body: 
+      application/json:
