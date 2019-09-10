@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="86c3c40f-f1cb-443a-bf1f-cbd2562d847a" >
+		<http:listener-connection host="${http.host}" port="${http.port}" />
+	</http:listener-config>
+	<global-property doc:name="Global Property" doc:id="9343aeb4-05d3-439e-9531-b3f56c66837c" name="apps.env" value="LOCAL" />
+	<configuration-properties doc:name="Configuration properties" doc:id="980f5ef2-1f42-42f2-b7ee-4840c1221456" file="properties/${apps.env}.yaml" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="2f4c06db-ac30-4d5f-97a8-0f48a2b8e6a9" >
+		<http:request-connection host="${http.sys.host}" port="${http.sys.port}" />
+	</http:request-config>
+	<flow name="contact-detailsFlow" doc:id="3d1e2806-a557-40f5-a400-b0e655fc8b52" >
+		<http:listener doc:name="Listener" doc:id="57ad4310-9686-4ad7-8baf-91e41c927d5c" config-ref="HTTP_Listener_config" path="${http.path}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="495060f7-0f3e-42a6-ba32-bd05047ca1e3" message="#[payload]"/>
+		<set-variable value="#[payload.Identification]" doc:name="vIdentification" doc:id="a320492f-dd80-4120-b759-e350f63ff814" variableName="vIdentification"/>
+		<set-variable value="#[payload.Address[0]]" doc:name="vAddress" doc:id="6c64a7a9-0d99-4809-b4bf-6403547e2901" variableName="vAddress"/>
+		<set-variable value="#[payload.Communication[0]]" doc:name="vCommunication" doc:id="aefc13f0-c2b6-444e-a379-ce81678fd9e0" variableName="vCommunication"/>
+		<logger level="INFO" doc:name="Logger" doc:id="df982c3c-62eb-4585-b938-1e4595baa8cd" message="identification -- #[vars.vIdentification] , address -- #[vars.vAddress],  communication -- #[vars.vCommunication]"/>
+		<http:request method="POST" doc:name="Request" doc:id="71b102fe-434a-4e51-ac39-216b20c6bea1" config-ref="HTTP_Request_configuration" path="${http.sys.path}"/>
+	</flow>
+</mule>

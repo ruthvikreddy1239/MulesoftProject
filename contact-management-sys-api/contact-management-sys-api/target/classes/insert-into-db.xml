@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="dc3c04fe-c0e9-4931-b510-7c8685cc38ea" >
+		<http:listener-connection host="${http.sys.host}" port="${http.sys.port}" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="75ed2da8-73cc-4a59-a55a-f3bee70955a1" file="properties/${apps.env}.yaml" />
+	<global-property doc:name="Global Property" doc:id="032246a7-1f15-4bd0-9719-16260f0b5ce9" name="apps.env" value="LOCAL" />
+	<flow name="insert-into-dbFlow" doc:id="9848cf44-eb72-4852-9046-3ffb9cc6d394" >
+		<http:listener doc:name="Listener" doc:id="1a26585a-216b-4e88-ab7e-b74f1a773928" config-ref="HTTP_Listener_config" path="${http.sys.path}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="37ff81bd-9576-429d-ae7b-871a996e6160" message="#[payload]"/>
+		<db:insert doc:name="Insert" doc:id="b7331bcc-d1e1-4eab-9271-41daea374869" >
+			<db:sql >INSERT INTO Table (identification, address, communication)
+VALUES (:identification, :address, :communication);</db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	identification: payload.attributes.queryParams.vIdentification,
+	address: payload.attributes.queryParams.vAddress,
+	communication: payload.attributes.queryParams.vCommunication
+}]]]></db:input-parameters>
+		</db:insert>
+	</flow>
+</mule>
